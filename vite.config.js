@@ -8,6 +8,7 @@ export default defineConfig({
         main: resolve(__dirname, 'index.html'),
         nosotros: resolve(__dirname, 'src/pages/nosotros.html'),
         admin: resolve(__dirname, 'src/pages/admin.html'),
+        login: resolve(__dirname, 'src/pages/login.html'),
       },
     },
   },
