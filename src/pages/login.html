@@ -13,17 +13,26 @@
 </head>
 <body>
 
-  <!-- ENCABEZADO -->
-  <header>
-    <div class="header-brand">
-      <h1>Escama y Colmillo</h1>
-      <p class="slogan">Acceso Administrativo</p>
-    </div>
+  <!-- ENCABEZADO UNIFICADO -->
+  <header class="main-header">
+    <div class="header-container">
+      <div class="header-brand">
+        <h1 class="brand-title">Escama y Colmillo</h1>
+        <p class="slogan">Crianza respetuosa, ejemplares sanos</p>
+        <span class="pimvs">Reg. PIMVS SEMARNAT: UMA-EX-0042-JAL</span>
+      </div>
 
-    <nav class="header-nav" aria-label="Navegación principal">
-      <a href="/index.html" class="btn-nav">Ver Catálogo</a>
-      <a href="/src/pages/nosotros.html" class="btn-nav">Nosotros</a>
-    </nav>
+      <div class="header-controls">
+        <nav class="header-nav" aria-label="Navegación principal">
+          <a href="/index.html" class="btn-nav">Ejemplares</a>
+          <a href="/src/pages/nosotros.html" class="btn-nav">Nosotros</a>
+        </nav>
+
+        <a href="https://wa.me/525573461033" target="_blank" rel="noopener" class="btn-header-whatsapp">
+          <i class="fa-brands fa-whatsapp"></i> <span>Contactar WhatsApp</span>
+        </a>
+      </div>
+    </div>
   </header>
 
   <!-- CONTENIDO PRINCIPAL DE LOGIN -->
@@ -53,9 +62,18 @@
     </section>
   </main>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>&copy; 2026 Escama y Colmillo - Control Interno</p>
+  <!-- FOOTER UNIFICADO -->
+  <footer class="main-footer">
+    <div class="footer-container">
+      <nav class="footer-nav" aria-label="Navegación secundaria">
+        <a href="/index.html">Catálogo</a>
+        <span class="separator">•</span>
+        <a href="/src/pages/nosotros.html">Nosotros</a>
+        <span class="separator">•</span>
+        <a href="/src/pages/admin.html">Admin</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Escama y Colmillo - Guadalajara, Jalisco, México</p>
+    </div>
   </footer>
 
   <script type="module" src="/src/views/login-views.js"></script>
