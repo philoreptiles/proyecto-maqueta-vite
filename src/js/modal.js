@@ -7,9 +7,6 @@ const WHATSAPP_NUMERO = '525573461033';
 let listaEjemplaresActuales = [];
 let indiceEjemplarActual = -1;
 
-/**
- * Inicializa escuchadores globales y eventos de zoom dinámico.
- */
 export function inicializarModal() {
   const vista = document.getElementById('vista-destacada');
   const btnCerrar = document.getElementById('modal-cerrar');
@@ -55,9 +52,6 @@ export function inicializarModal() {
   }
 }
 
-/**
- * Controla el zoom dinámico al pasar el cursor sobre la imagen principal.
- */
 function inicializarZoomGaleria() {
   const galeriaMain = document.querySelector('.galeria-main');
   const mainImg = document.getElementById('modal-img');
@@ -82,9 +76,6 @@ function inicializarZoomGaleria() {
   });
 }
 
-/**
- * Actualiza la habilitación de los botones laterales según la posición actual.
- */
 function actualizarEstadoNavegacion() {
   const btnPrev = document.getElementById('modal-prev');
   const btnNext = document.getElementById('modal-next');
@@ -97,10 +88,6 @@ function actualizarEstadoNavegacion() {
   }
 }
 
-/**
- * Navega entre las fichas de los ejemplares con límites en los extremos.
- * @param {number} direccion - (-1 para anterior, 1 para siguiente)
- */
 function navegarEjemplar(direccion) {
   if (!listaEjemplaresActuales.length || indiceEjemplarActual === -1) return;
 
@@ -112,9 +99,6 @@ function navegarEjemplar(direccion) {
   abrirModalEjemplar(siguienteEjemplar, listaEjemplaresActuales, nuevoIndice);
 }
 
-/**
- * Despliega la ficha técnica del ejemplar seleccionado.
- */
 export function abrirModalEjemplar(ejemplar, listaContexto = [], indiceForzado = -1) {
   const vista = document.getElementById('vista-destacada');
   if (!vista || !ejemplar) return;
@@ -158,6 +142,7 @@ export function abrirModalEjemplar(ejemplar, listaContexto = [], indiceForzado =
   const thumbsContainer = document.getElementById('modal-galeria-thumbs');
 
   if (mainImg) {
+    // OPTIMIZACIÓN 1: El visualizador principal recibe la URL que almacenamos en DB y asume calidad Full 1200x1200px
     mainImg.src = imagenes.length > 0 ? imagenes[0] : 'https://placehold.co/600x400/141b21/94a3b8?text=Sin+imagen';
     mainImg.alt = ejemplar.genetica || 'Ejemplar';
     mainImg.style.transformOrigin = 'center center';
@@ -168,12 +153,14 @@ export function abrirModalEjemplar(ejemplar, listaContexto = [], indiceForzado =
     if (imagenes.length > 1) {
       imagenes.forEach((url, index) => {
         const thumb = document.createElement('img');
-        thumb.src = url;
+        
+        // Usamos el Thumbnail _thumb para ahorrar peticiones pesadas en las vistas inferiores
+        thumb.src = url.includes('_full.webp') ? url.replace('_full.webp', '_thumb.webp') : url;
         thumb.alt = `Vista ${index + 1}`;
         thumb.className = `thumb-img ${index === 0 ? 'activo' : ''}`;
         
         thumb.addEventListener('click', () => {
-          mainImg.src = url;
+          mainImg.src = url; // Renderiza el 1200x1200 en el viewer principal
           thumbsContainer.querySelectorAll('.thumb-img').forEach((t, i) => {
             t.classList.toggle('activo', i === index);
           });
@@ -223,9 +210,6 @@ export function abrirModalEjemplar(ejemplar, listaContexto = [], indiceForzado =
   document.body.classList.add('modal-open');
 }
 
-/**
- * Oculta la ficha técnica y limpia la dirección URL.
- */
 export function cerrarModal() {
   const vista = document.getElementById('vista-destacada');
   if (vista) {

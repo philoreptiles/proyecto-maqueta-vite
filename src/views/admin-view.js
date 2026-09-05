@@ -1,15 +1,17 @@
-import { supabase } from '../js/supabase-config.js';
-import { comprimirImagen } from '../utils/image-compressor.js';
+import { supabase, CACHE_CONFIG } from '../js/supabase-config.js';
+import { generarVersionesImagen } from '../utils/image-compressor.js';
 
-// Nombre exacto del Bucket en Supabase Storage
 const BUCKET_NAME = 'ejemplares';
 
 let inventarioCompleto = [];
 let mostrandoUltimos5 = false;
 
-document.addEventListener('DOMContentLoaded', () => {
+// Inicialización segura contra condiciones de carrera en módulos
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initAdminView);
+} else {
   initAdminView();
-});
+}
 
 async function initAdminView() {
   setupFileInputs();
@@ -62,6 +64,22 @@ function setupEventListeners() {
 
   document.getElementById('btn-toggle-limit')?.addEventListener('click', toggleLimite);
 
+  // Escuchador de Cerrar Sesión (busca por ID o por clase)
+  const logoutBtn = document.getElementById('btn-logout') || document.querySelector('.btn-logout') || document.querySelector('button[aria-label="Cerrar Sesión"]');
+  
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        await supabase.auth.signOut();
+      } catch (err) {
+        console.warn('Error al cerrar sesión en Supabase:', err);
+      } finally {
+        window.location.href = '/src/pages/login.html';
+      }
+    });
+  }
+
   const triggerEspecie = document.getElementById('dropdown-trigger-especie');
   const containerEspecie = document.getElementById('filtro-especie-container');
 
@@ -79,36 +97,30 @@ function setupEventListeners() {
       e.stopPropagation();
     });
   }
-
-  document.getElementById('btn-logout')?.addEventListener('click', async () => {
-    await supabase.auth.signOut();
-    window.location.href = '/src/pages/login.html';
-  });
 }
 
-/* SUBIDA DE IMÁGENES A SUPABASE STORAGE CON COMPRESIÓN WEBP */
+/* SUBIDA DE IMÁGENES A SUPABASE STORAGE */
 async function procesarYSubirImagen(file) {
   if (!file) return null;
 
   try {
-    const archivoOptimizado = await comprimirImagen(file);
-    const fileExt = archivoOptimizado.name.split('.').pop();
-    const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
+    const { thumbnail, completa } = await generarVersionesImagen(file);
 
-    const { error: uploadError } = await supabase.storage
+    const { error: errorThumb } = await supabase.storage
       .from(BUCKET_NAME)
-      .upload(fileName, archivoOptimizado, { cacheControl: '3600', upsert: false });
+      .upload(thumbnail.name, thumbnail, CACHE_CONFIG);
 
-    if (uploadError) {
-      if (uploadError.message?.includes('Bucket not found') || uploadError.error === 'Bucket not found') {
-        throw new Error(`El bucket '${BUCKET_NAME}' no existe en tu proyecto de Supabase. Créalo desde el panel con acceso público.`);
-      }
-      throw uploadError;
-    }
+    if (errorThumb) throw errorThumb;
+
+    const { error: errorCompleta } = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(completa.name, completa, CACHE_CONFIG);
+
+    if (errorCompleta) throw errorCompleta;
 
     const { data } = supabase.storage
       .from(BUCKET_NAME)
-      .getPublicUrl(fileName);
+      .getPublicUrl(completa.name);
 
     return data.publicUrl;
   } catch (err) {
@@ -202,7 +214,6 @@ async function cargarInventario() {
     renderizarCards(inventarioCompleto);
   } catch (err) {
     console.error('Error al cargar inventario:', err);
-    alert(`Error al consultar inventario: ${err.message || err}`);
   }
 }
 
@@ -299,7 +310,7 @@ function toggleLimite() {
   aplicarFiltros();
 }
 
-/* RENDER CARDS CON LAZY LOADING */
+/* RENDER CARDS */
 function renderizarCards(items) {
   const container = document.getElementById('cards-container');
   if (!container) return;
@@ -311,11 +322,15 @@ function renderizarCards(items) {
     return;
   }
 
-  container.innerHTML = lista.map(item => `
+  container.innerHTML = lista.map(item => {
+    const imgOriginal = item.imagen_url || '';
+    const thumbUrl = imgOriginal.includes('_full.webp') ? imgOriginal.replace('_full.webp', '_thumb.webp') : (imgOriginal || '/placeholder.jpg');
+
+    return `
     <div class="item-card">
       <div class="card-image-wrapper">
         <img 
-          src="${item.imagen_url || '/placeholder.jpg'}" 
+          src="${thumbUrl}" 
           alt="${item.genetica || ''}" 
           class="card-image"
           loading="lazy"
@@ -342,7 +357,7 @@ function renderizarCards(items) {
         </div>
       </div>
     </div>
-  `).join('');
+  `}).join('');
 }
 
 /* MODAL DE EDICIÓN */

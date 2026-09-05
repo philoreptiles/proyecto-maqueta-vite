@@ -9,6 +9,10 @@ const WHATSAPP_NUMERO = '525573461033';
 let todosLosEjemplares = [];
 let ejemplaresFiltradosActuales = [];
 
+// Variables de estado para Carga Perezosa (Optimización 2)
+let elementosVisibles = 15;
+let observerCargaPerezosa = null;
+
 window.abrirModalEjemplar = (id) => {
   const ejemplar = todosLosEjemplares.find(e => String(e.id) === String(id) || String(e.codigo) === String(id));
   if (ejemplar) abrirModalEjemplar(ejemplar, ejemplaresFiltradosActuales);
@@ -37,7 +41,7 @@ export async function cargarEjemplares() {
     inicializarEventosFiltros();
     inicializarBotonVolverInicio();
 
-    renderizarEjemplares(ejemplaresFiltradosActuales);
+    renderizarEjemplares(ejemplaresFiltradosActuales, true);
     verificarDeepLinking(todosLosEjemplares);
 
     return todosLosEjemplares;
@@ -63,27 +67,44 @@ function verificarDeepLinking(ejemplares) {
   }
 }
 
-function renderizarEjemplares(ejemplares) {
+/**
+ * Modificada para manejar inyección gradual (Intersection Observer)
+ * @param {Array} ejemplares Arreglo filtrado a mostrar
+ * @param {boolean} reset Resetea la grilla e inicializa los contadores (verdadero para filtros iniciales)
+ */
+function renderizarEjemplares(ejemplares, reset = true) {
   const grid = document.querySelector('.grid-ejemplares');
   if (!grid) return;
+
+  if (reset) {
+    elementosVisibles = 15;
+    grid.innerHTML = '';
+  }
 
   if (ejemplares.length === 0) {
     grid.innerHTML = `<div class="mensaje-vacio"><p>No hay ejemplares que coincidan con los filtros seleccionados.</p></div>`;
     return;
   }
 
+  const inicio = reset ? 0 : elementosVisibles - 10;
+  const lote = ejemplares.slice(inicio, Math.min(elementosVisibles, ejemplares.length));
+  
   let html = '';
-  ejemplares.forEach((ejemplar) => {
+  lote.forEach((ejemplar) => {
     const precioFormateado = formatearPrecio(ejemplar.precio);
     const estadoClase = ejemplar.estatus ? ejemplar.estatus.toLowerCase() : 'disponible';
-    const imagenUrl = ejemplar.imagen_url || (Array.isArray(ejemplar.imagenes) && ejemplar.imagenes[0]) || 'https://placehold.co/600x400/141b21/94a3b8?text=Sin+imagen';
+    let imagenUrl = ejemplar.imagen_url || (Array.isArray(ejemplar.imagenes) && ejemplar.imagenes[0]) || 'https://placehold.co/600x400/141b21/94a3b8?text=Sin+imagen';
+    
+    // OPTIMIZACIÓN 1: Uso dinámico de Thumbnail sustituyendo el subfijo original
+    const thumbUrl = imagenUrl.includes('_full.webp') ? imagenUrl.replace('_full.webp', '_thumb.webp') : imagenUrl;
+
     const codigo = ejemplar.codigo || ejemplar.id;
     const idSeguro = String(ejemplar.id).replace(/'/g, "\\'");
 
     html += `
       <div class="tarjeta" data-id="${ejemplar.id}" onclick="window.abrirModalEjemplar('${idSeguro}')">
         <div class="tarjeta-imagen">
-          <img src="${imagenUrl}" alt="${ejemplar.genetica || 'Ejemplar'}" loading="lazy">
+          <img src="${thumbUrl}" alt="${ejemplar.genetica || 'Ejemplar'}" loading="lazy">
           <span class="estado ${estadoClase}">${ejemplar.estatus || 'Disponible'}</span>
         </div>
         <div class="tarjeta-contenido">
@@ -112,7 +133,46 @@ function renderizarEjemplares(ejemplares) {
     `;
   });
 
-  grid.innerHTML = html;
+  if (reset) {
+    grid.innerHTML = html;
+  } else {
+    grid.insertAdjacentHTML('beforeend', html);
+  }
+
+  // OPTIMIZACIÓN 2: Lógica de Intersection Observer
+  if (observerCargaPerezosa) observerCargaPerezosa.disconnect();
+
+  if (elementosVisibles < ejemplares.length) {
+    const items = grid.querySelectorAll('.tarjeta');
+    const ultimoItem = items[items.length - 1];
+
+    observerCargaPerezosa = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        elementosVisibles += 10;
+        renderizarEjemplares(ejemplares, false);
+      }
+    }, { rootMargin: "300px" }); // Se dispara 300px antes de llegar al final
+
+    if (ultimoItem) observerCargaPerezosa.observe(ultimoItem);
+  }
+
+  // OPTIMIZACIÓN 4: Precarga de siguientes imágenes
+  precargarSiguientes(elementosVisibles, ejemplares);
+}
+
+/**
+ * OPTIMIZACIÓN 4: PRECARGA INTELIGENTE
+ * Precarga de forma fantasma en memoria las siguientes 5 miniaturas para que fluyan al scrollear
+ */
+function precargarSiguientes(indexActual, totalEjemplares) {
+  const siguientes = totalEjemplares.slice(indexActual, indexActual + 5);
+  siguientes.forEach(ejemplar => {
+    let imagenUrl = ejemplar.imagen_url || (Array.isArray(ejemplar.imagenes) && ejemplar.imagenes[0]);
+    if (imagenUrl && imagenUrl.includes('_full.webp')) {
+      const imgFantasma = new Image();
+      imgFantasma.src = imagenUrl.replace('_full.webp', '_thumb.webp');
+    }
+  });
 }
 
 function poblarOpcionesAnios(ejemplares) {
@@ -165,7 +225,8 @@ function aplicarFiltros() {
     ejemplaresFiltradosActuales.sort((a, b) => (Number(b.precio) || 0) - (Number(a.precio) || 0));
   }
 
-  renderizarEjemplares(ejemplaresFiltradosActuales);
+  // Se vuelve a iniciar renderizado desde 0 tras el filtro
+  renderizarEjemplares(ejemplaresFiltradosActuales, true);
 }
 
 function limpiarFiltros() {
@@ -173,7 +234,8 @@ function limpiarFiltros() {
   const form = document.getElementById('form-filtros');
   if (form) form.reset();
   ejemplaresFiltradosActuales = [...todosLosEjemplares];
-  renderizarEjemplares(ejemplaresFiltradosActuales);
+  // Se vuelve a iniciar renderizado desde 0
+  renderizarEjemplares(ejemplaresFiltradosActuales, true);
 }
 
 function inicializarBotonVolverInicio() {
