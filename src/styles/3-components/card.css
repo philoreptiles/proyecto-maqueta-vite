@@ -1,0 +1,490 @@
+/* ========================================
+   TARJETAS Y FILTROS DEL CATÁLOGO
+   ======================================== */
+
+.catalogo {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 16px;
+}
+
+/* ENCABEZADO DEL CATÁLOGO */
+.catalogo-header {
+  text-align: center;
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.catalogo-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(250, 204, 21, 0.08);
+  color: var(--color-primary);
+  border: 1px solid rgba(250, 204, 21, 0.25);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 20px;
+}
+
+.catalogo h2 {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: -0.5px;
+  margin: 0;
+  max-width: 780px;
+  line-height: 1.25;
+}
+
+.catalogo .subtitulo {
+  font-size: 0.95rem;
+  color: var(--color-text-muted);
+  max-width: 620px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.catalogo .subtitulo em {
+  color: var(--color-primary);
+  font-style: italic;
+  font-weight: 600;
+}
+
+.catalogo .subtitulo .ubicacion {
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+/* BLOQUEO DE SCROLL EN FONDO */
+body.modal-open {
+  overflow: hidden !important;
+}
+
+/* CONTENEDOR DE FILTROS Y GRID DISTRIBUIDO */
+.contenedor-filtros {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 18px 24px;
+  margin: 0 auto 32px auto;
+  width: 100%;
+  box-sizing: border-box;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+}
+
+.grid-filtros {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  align-items: end;
+  width: 100%;
+}
+
+.grupo-filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  width: 100%;
+}
+
+.grupo-filtro label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: center;
+  width: 100%;
+  display: block;
+}
+
+.grupo-filtro input,
+.grupo-filtro select {
+  background: var(--color-bg);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  outline: none;
+  transition: var(--transition);
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  text-align-last: center;
+}
+
+.grupo-filtro input:focus,
+.grupo-filtro select:focus {
+  border-color: var(--color-primary);
+}
+
+.acciones-filtros {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.btn-filtrar {
+  background: var(--color-primary);
+  color: #000;
+  border: none;
+  padding: 8px 22px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-filtrar:hover {
+  background: var(--color-primary-hover);
+}
+
+.btn-limpiar {
+  background: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  padding: 8px 22px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-limpiar:hover {
+  color: var(--color-text);
+  border-color: var(--color-text-muted);
+}
+
+/* BOTÓN VOLVER AL INICIO */
+.btn-volver-inicio {
+  background: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  padding: 8px 22px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: var(--transition);
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-volver-inicio:hover {
+  background: var(--color-primary);
+  color: #000000;
+}
+
+/* GRID Y TARJETAS */
+.grid-ejemplares {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.tarjeta {
+  position: relative;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+.tarjeta:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-primary);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+}
+
+.tarjeta-imagen {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #0d1117;
+}
+
+.tarjeta-imagen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.tarjeta:hover .tarjeta-imagen img {
+  transform: scale(1.05);
+}
+
+.estado {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 5;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  padding: 4px 10px;
+  border-radius: 30px;
+  backdrop-filter: blur(8px);
+}
+
+.estado.disponible {
+  background: rgba(250, 204, 21, 0.9);
+  color: #0b0f12;
+}
+
+.estado.apartado {
+  background: rgba(245, 158, 11, 0.85);
+  color: #fff;
+}
+
+.estado.vendido {
+  background: rgba(239, 68, 68, 0.85);
+  color: #fff;
+}
+
+.tarjeta-contenido {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.tarjeta-contenido h3 {
+  font-family: var(--font-title);
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.genetica {
+  font-size: 0.88rem;
+  color: var(--color-primary);
+  font-weight: 600;
+  margin-top: -2px;
+}
+
+.detalles {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  border-top: 1px dashed var(--color-border);
+  padding-top: 8px;
+  margin-top: 2px;
+}
+
+.detalles strong {
+  color: var(--color-text);
+}
+
+.tarjeta-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-border);
+}
+
+.precio {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.acciones {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-ver-ficha {
+  background: transparent;
+  border: 1px solid var(--color-primary, #eab308);
+  color: var(--color-primary, #eab308);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-ver-ficha:hover {
+  background-color: var(--color-primary, #eab308);
+  color: #000;
+}
+
+.btn-whatsapp {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #25d366;
+  color: #002b0b;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.78rem;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition);
+  white-space: nowrap;
+}
+
+.btn-whatsapp:hover {
+  background: #128c7e;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+}
+
+.mensaje-vacio,
+.mensaje-error {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 40px 20px;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+}
+
+.mensaje-error {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.mensaje-vacio p,
+.mensaje-error p {
+  margin: 0;
+}
+
+/* RESPONSIVO DE GRID DE TARJETAS Y ADAPTACIÓN MÓVIL */
+@media (max-width: 1024px) {
+  .grid-filtros {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .grid-ejemplares {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .catalogo {
+    padding: 20px 8px;
+  }
+
+  .catalogo-header {
+    margin-bottom: 18px;
+    gap: 6px;
+  }
+
+  .catalogo-badge {
+    font-size: 0.62rem;
+    padding: 3px 10px;
+  }
+
+  .catalogo h2 {
+    font-size: 1.35rem;
+  }
+
+  .catalogo .subtitulo {
+    font-size: 0.8rem;
+  }
+
+  .contenedor-filtros {
+    padding: 10px 12px;
+    margin-bottom: 20px;
+  }
+
+  .grid-filtros {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+  }
+
+  /* 2 FICHAS POR RENGLÓN EN MÓVIL */
+  .grid-ejemplares {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .tarjeta-contenido {
+    padding: 8px;
+    gap: 4px;
+  }
+
+  .tarjeta-contenido h3 {
+    font-size: 0.78rem;
+    line-height: 1.2;
+  }
+
+  .genetica {
+    font-size: 0.72rem;
+  }
+
+  .detalles {
+    font-size: 0.65rem;
+    padding-top: 4px;
+    margin-top: 2px;
+    flex-wrap: wrap;
+    gap: 2px 6px;
+  }
+
+  .tarjeta-footer {
+    margin-top: 4px;
+    padding-top: 6px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .precio {
+    font-size: 0.85rem;
+    text-align: center;
+  }
+
+  .acciones {
+    width: 100%;
+    gap: 4px;
+  }
+
+  .btn-ver-ficha,
+  .btn-whatsapp {
+    flex: 1;
+    justify-content: center;
+    padding: 5px 4px;
+    font-size: 0.68rem;
+    text-align: center;
+  }
+
+  .estado {
+    font-size: 0.55rem;
+    padding: 2px 6px;
+    top: 6px;
+    right: 6px;
+  }
+}

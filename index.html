@@ -1,0 +1,189 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escama y Colmillo - Catálogo</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="/src/styles/main.css">
+</head>
+<body>
+
+  <!-- ENCABEZADO -->
+  <header class="main-header">
+    <div class="header-container">
+      <div class="header-brand">
+        <h1 class="brand-title">Escama y Colmillo</h1>
+        <p class="slogan">Crianza respetuosa, ejemplares sanos</p>
+        <span class="pimvs">REG. PIMVS SEMARNAT: UMA-EX-0042-JAL</span>
+      </div>
+
+      <div class="header-controls">
+        <nav class="header-nav" aria-label="Navegación principal">
+          <a href="/index.html" class="btn-nav activo">Ejemplares</a>
+          <a href="/src/pages/nosotros.html" class="btn-nav">Nosotros</a>
+        </nav>
+
+        <a href="https://wa.me/525573461033" target="_blank" rel="noopener" class="btn-header-whatsapp">
+          💬 Contactar WhatsApp
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main>
+    <section class="catalogo">
+      <div class="catalogo-header">
+        <span class="catalogo-badge">✦ Criadero Especializado</span>
+        <h2>Colección Exclusiva de Víboras de Cascabel</h2>
+        <p class="subtitulo">
+          Especialistas en la selección, reproducción en cautiverio y conservación del género <em>Crotalus</em>. <span class="ubicacion">Guadalajara, Jalisco.</span>
+        </p>
+      </div>
+
+      <!-- SECCIÓN DE FILTROS -->
+      <div id="seccion-filtros" class="contenedor-filtros">
+        <form id="form-filtros" class="grid-filtros" onsubmit="event.preventDefault();">
+          
+          <div class="grupo-filtro">
+            <label for="filtro-genetica">Genética</label>
+            <input type="text" id="filtro-genetica" placeholder="Buscar por genética...">
+          </div>
+
+          <div class="grupo-filtro">
+            <label for="filtro-estatus">Disponibilidad</label>
+            <select id="filtro-estatus">
+              <option value="">Todos</option>
+              <option value="disponible">Disponible</option>
+              <option value="apartado">Apartado</option>
+              <option value="vendido">Vendido</option>
+            </select>
+          </div>
+
+          <div class="grupo-filtro">
+            <label for="filtro-sexo">Sexo</label>
+            <select id="filtro-sexo">
+              <option value="">Todos</option>
+              <option value="Macho">Macho</option>
+              <option value="Hembra">Hembra</option>
+              <option value="No sexado">No sexado</option>
+            </select>
+          </div>
+
+          <div class="grupo-filtro">
+            <label for="filtro-anio">Año</label>
+            <select id="filtro-anio">
+              <option value="">Todos</option>
+            </select>
+          </div>
+
+          <div class="grupo-filtro">
+            <label for="filtro-precio">Rango de precio</label>
+            <select id="filtro-precio">
+              <option value="">Todos los precios</option>
+              <option value="2000-3999">$2,000 - $3,999</option>
+              <option value="4000-9999">$4,000 - $9,999</option>
+              <option value="10000+">$10,000+</option>
+            </select>
+          </div>
+
+          <div class="grupo-filtro">
+            <label for="filtro-orden">Ordenar</label>
+            <select id="filtro-orden">
+              <option value="">Predeterminado</option>
+              <option value="precio-asc">Precio: Menor a Mayor</option>
+              <option value="precio-desc">Precio: Mayor a Menor</option>
+            </select>
+          </div>
+
+          <div class="acciones-filtros">
+            <button type="button" id="btn-aplicar-filtros" class="btn-filtrar">Aplicar filtros</button>
+            <button type="button" id="btn-limpiar-filtros" class="btn-limpiar">Limpiar filtros</button>
+            <button type="button" id="btn-volver-inicio" class="btn-volver-inicio" title="Volver al inicio de la página">Volver al inicio</button>
+          </div>
+
+        </form>
+      </div>
+
+      <!-- Grid de ejemplares -->
+      <div class="grid-ejemplares"></div>
+    </section>
+  </main>
+
+  <!-- MODAL RÁPIDO CON CONTROLES DE NAVEGACIÓN -->
+  <div id="vista-destacada" class="vista-destacada oculto" aria-hidden="true">
+    <button class="modal-nav-btn modal-prev" id="modal-prev" aria-label="Ejemplar anterior">&lsaquo;</button>
+    
+    <div class="vista-destacada-contenido modal-quickview">
+      <button class="vista-destacada-cerrar" id="modal-cerrar" aria-label="Cerrar vista">&times;</button>
+      
+      <div class="modal-grid">
+        <div class="modal-col-imagen">
+          <div class="galeria-layout">
+            <div class="galeria-main">
+              <img id="modal-img" src="" alt="Ejemplar en vista destacada">
+              <span id="modal-estatus" class="estado"></span>
+            </div>
+            <div id="modal-galeria-thumbs" class="galeria-thumbs-horizontal"></div>
+          </div>
+        </div>
+
+        <div class="modal-col-detalles">
+          <div>
+            <span class="modal-subtitulo" id="modal-especie"></span>
+            <h3 id="modal-genetica"></h3>
+            <div class="modal-precio-box">
+              <span class="modal-precio" id="modal-precio"></span>
+            </div>
+            <div class="modal-info-grid">
+              <div class="info-item">
+                <span class="label">ID de Registro:</span>
+                <span class="value" id="modal-id"></span>
+              </div>
+              <div class="info-item">
+                <span class="label">Sexo:</span>
+                <span class="value" id="modal-sexo"></span>
+              </div>
+              <div class="info-item">
+                <span class="label">Año de nacimiento:</span>
+                <span class="value" id="modal-nacimiento"></span>
+              </div>
+            </div>
+          </div>
+          <div class="modal-acciones">
+            <a href="#" id="modal-btn-whatsapp" target="_blank" rel="noopener" class="btn-whatsapp btn-whatsapp-lg">
+              Consultar disponibilidad por WhatsApp
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="modal-nav-btn modal-next" id="modal-next" aria-label="Siguiente ejemplar">&rsaquo;</button>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="main-footer">
+    <div class="footer-container">
+      <nav class="footer-nav" aria-label="Navegación secundaria">
+        <a href="/index.html">Catálogo</a>
+        <span class="separator">•</span>
+        <a href="/src/pages/nosotros.html">Nosotros</a>
+        <span class="separator">•</span>
+        <a href="/src/pages/admin.html">Admin</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Escama y Colmillo - Guadalajara, Jalisco, México</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script type="module" src="/src/js/app.js"></script>
+
+</body>
+</html>

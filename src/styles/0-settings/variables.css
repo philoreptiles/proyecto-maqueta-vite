@@ -1,0 +1,29 @@
+/* ========================================
+   VARIABLES GLOBALES DEL TEMA
+   ======================================== */
+
+:root {
+  /* Paleta Principal */
+  --color-primary: #facc15;          /* Amarillo principal */
+  --color-primary-hover: #eab308;    /* Amarillo intenso para hover */
+  --color-secondary: #f97316;        /* Naranja secundario */
+  --color-secondary-hover: #ea580c;  /* Naranja oscuro para hover */
+  --color-tertiary: #1f2937;         /* Gris oscuro terciario */
+
+  /* Entorno y Fondo Oscuro */
+  --color-bg: #0c0c0e;               /* Fondo base */
+  --color-surface: #18181b;          /* Superficie de tarjetas y filtros */
+  --color-border: #27272a;           /* Bordes integrados */
+
+  /* Textos */
+  --color-text: #ffffff;             /* Texto principal */
+  --color-text-muted: #a1a1aa;       /* Texto secundario */
+
+  /* Tipografías */
+  --font-title: 'Montserrat', sans-serif;
+  --font-body: 'Arial', sans-serif;
+
+  /* Propiedades Generales */
+  --radius: 12px;
+  --transition: all 0.3s ease;
+}

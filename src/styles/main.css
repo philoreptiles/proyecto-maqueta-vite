@@ -1,0 +1,346 @@
+/* src/styles/main.css */
+
+/* 1. CONFIGURACIÓN GLOBAL */
+@import './0-settings/variables.css';
+
+/* 2. ESTILOS BASE */
+@import './2-base/reset.css';
+@import './2-base/typography.css';
+
+/* 3. COMPONENTES */
+@import './3-components/header.css';
+@import './3-components/card.css';
+@import './3-components/modal.css';
+@import './3-components/footer.css';
+@import './3-components/admin.css';
+
+/* AJUSTES DE CUERPO GENERAL Y MOVILIDAD */
+html, body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg, #0d0d0f);
+  color: var(--color-text, #f4f4f5);
+  font-family: 'Montserrat', sans-serif;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+/* SECCIÓN DE FILTROS STICKY COMPACTO */
+.contenedor-filtros {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  background: rgba(13, 13, 15, 0.92);
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--color-border, #2e2e35);
+  margin-bottom: 1.5rem;
+  backdrop-filter: blur(8px);
+}
+
+.grid-filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 10px;
+}
+
+.grupo-filtro {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 120px;
+  min-width: 80px;
+}
+
+.grupo-filtro:has(#filtro-estatus),
+.grupo-filtro:has(#filtro-sexo),
+.grupo-filtro:has(#filtro-anio) {
+  flex: 0 1 92px;
+  min-width: 80px;
+}
+
+.grupo-filtro:has(#filtro-genetica) {
+  flex: 1.5 1 130px;
+}
+
+.grupo-filtro label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-muted, #94949e);
+  white-space: nowrap;
+}
+
+.grupo-filtro input,
+.grupo-filtro select {
+  width: 100%;
+  height: 34px;
+  padding: 2px 8px;
+  font-size: 0.78rem;
+  border-radius: 6px;
+  border: 1px solid var(--color-border, #2e2e35);
+  background: var(--color-surface, #17171a);
+  color: var(--color-text, #f4f4f5);
+  box-sizing: border-box;
+}
+
+.acciones-filtros {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+  margin-left: auto;
+}
+
+.acciones-filtros button {
+  height: 34px;
+  padding: 0 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.btn-filtrar {
+  background: var(--color-primary, #eab308);
+  color: #000;
+  border: none;
+}
+
+.btn-limpiar,
+.btn-volver-inicio {
+  background: transparent;
+  color: var(--color-text-muted, #94949e);
+  border: 1px solid var(--color-border, #2e2e35);
+}
+
+/* OPTIMIZACIÓN COMPACTA DE FILTROS EN MÓVIL */
+@media (max-width: 768px) {
+  .contenedor-filtros {
+    padding: 6px 10px;
+    margin-bottom: 1rem;
+  }
+
+  .grid-filtros {
+    gap: 6px;
+  }
+
+  .grupo-filtro {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+  }
+
+  .grupo-filtro label {
+    font-size: 0.62rem;
+  }
+
+  .grupo-filtro input,
+  .grupo-filtro select {
+    height: 32px;
+    font-size: 0.72rem;
+    padding: 2px 6px;
+  }
+
+  .acciones-filtros {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 4px;
+    justify-content: space-between;
+  }
+
+  .acciones-filtros button {
+    height: 32px;
+    padding: 0 8px;
+    font-size: 0.72rem;
+    flex: 1;
+  }
+}
+
+/* SECCIÓN NOSOTROS RESPONSIVA */
+.seccion-nosotros {
+  max-width: 1100px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto;
+  padding: 32px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.nosotros-hero {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.catalogo-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-primary, #eab308);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  background: rgba(234, 179, 8, 0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 1px solid rgba(234, 179, 8, 0.2);
+}
+
+.nosotros-hero h2 {
+  font-size: 2rem;
+  color: var(--color-text, #f4f4f5);
+  max-width: 750px;
+  line-height: 1.25;
+  margin: 6px 0;
+}
+
+.nosotros-hero .subtitulo {
+  font-size: 0.92rem;
+  color: var(--color-text-muted, #94949e);
+  max-width: 650px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.grid-pilares {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.tarjeta-pilar {
+  background: var(--color-surface, #17171a);
+  border: 1px solid var(--color-border, #2e2e35);
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.tarjeta-pilar:hover {
+  border-color: var(--color-primary, #eab308);
+  transform: translateY(-3px);
+}
+
+.pilar-icono {
+  font-size: 1.8rem;
+  color: var(--color-primary, #eab308);
+  margin-bottom: 2px;
+}
+
+.tarjeta-pilar h3 {
+  font-size: 1.05rem;
+  color: var(--color-text, #f4f4f5);
+  margin: 0;
+}
+
+.tarjeta-pilar p {
+  font-size: 0.84rem;
+  color: var(--color-text-muted, #94949e);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.bloque-info-nosotros {
+  background: var(--color-surface, #17171a);
+  border: 1px solid var(--color-border, #2e2e35);
+  border-radius: 10px;
+  padding: 28px 20px;
+  text-align: center;
+}
+
+.info-texto h3 {
+  font-size: 1.35rem;
+  color: var(--color-text, #f4f4f5);
+  margin: 0 0 10px 0;
+}
+
+.info-texto p {
+  color: var(--color-text-muted, #94949e);
+  font-size: 0.9rem;
+  max-width: 800px;
+  margin: 0 auto 18px auto;
+  line-height: 1.6;
+}
+
+.ubi-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(234, 179, 8, 0.08);
+  border: 1px solid rgba(234, 179, 8, 0.25);
+  color: var(--color-primary, #eab308);
+  padding: 8px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+/* ADAPTACIÓN CELULAR NOSOTROS */
+@media (max-width: 768px) {
+  .seccion-nosotros {
+    padding: 20px 12px;
+    gap: 20px;
+  }
+
+  .nosotros-hero h2 {
+    font-size: 1.35rem;
+  }
+
+  .nosotros-hero .subtitulo {
+    font-size: 0.82rem;
+  }
+
+  .grid-pilares {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .tarjeta-pilar {
+    padding: 16px;
+  }
+
+  .tarjeta-pilar h3 {
+    font-size: 0.95rem;
+  }
+
+  .tarjeta-pilar p {
+    font-size: 0.8rem;
+  }
+
+  .bloque-info-nosotros {
+    padding: 18px 14px;
+  }
+
+  .info-texto h3 {
+    font-size: 1.15rem;
+  }
+
+  .info-texto p {
+    font-size: 0.82rem;
+  }
+
+  .ubi-badge {
+    font-size: 0.72rem;
+    padding: 6px 12px;
+  }
+}

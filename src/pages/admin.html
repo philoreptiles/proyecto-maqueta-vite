@@ -1,0 +1,353 @@
+<!-- src/pages/admin.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administración - Escama y Colmillo</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/src/styles/main.css">
+  <link rel="stylesheet" href="/src/styles/3-components/admin.css">
+</head>
+<body>
+
+  <header class="admin-header">
+    <div class="header-brand">
+      <h1>Escama y Colmillo</h1>
+      <p class="slogan">Panel de Control de Inventario Premium</p>
+    </div>
+
+    <nav class="header-nav" aria-label="Navegación principal">
+      <a href="/index.html" class="btn-nav">Catálogo</a>
+      <a href="/src/pages/nosotros.html" class="btn-nav">Nosotros</a>
+      <a href="/src/pages/admin.html" class="btn-nav activo">Admin</a>
+      <button type="button" id="btn-logout" class="btn-logout">
+        <i class="fa-solid fa-right-from-bracket"></i> <span>Cerrar Sesión</span>
+      </button>
+    </nav>
+  </header>
+
+  <main class="admin-container">
+
+    <!-- DASHBOARD KPIS -->
+    <section class="admin-metrics-grid">
+      <div class="metric-card">
+        <span class="metric-title">Total Registros</span>
+        <strong id="metric-total" class="metric-value">0</strong>
+      </div>
+      <div class="metric-card highlight-disponible">
+        <span class="metric-title">Disponibles</span>
+        <strong id="metric-disponibles" class="metric-value">0</strong>
+      </div>
+      <div class="metric-card highlight-apartado">
+        <span class="metric-title">Apartados</span>
+        <strong id="metric-apartados" class="metric-value">0</strong>
+      </div>
+      <div class="metric-card highlight-gold">
+        <span class="metric-title">Valor Activo</span>
+        <strong id="metric-valor" class="metric-value">$0 MXN</strong>
+      </div>
+    </section>
+
+    <div class="admin-main-wrapper">
+      
+      <!-- FORMULARIO DE ALTA -->
+      <section class="admin-panel form-panel">
+        <div class="panel-header">
+          <h2 id="form-title"><i class="fa-solid fa-plus-circle"></i> Registrar Ejemplar</h2>
+        </div>
+
+        <form id="form-ejemplar" class="admin-form">
+          <div class="form-group">
+            <label for="input-id">ID / Código Único *</label>
+            <input type="text" id="input-id" required placeholder="Ej. CR-2026-01">
+          </div>
+
+          <div class="form-group">
+            <label for="select-especie">Especie *</label>
+            <select id="select-especie" class="custom-select" required>
+              <option value="">Selecciona especie...</option>
+              <option value="Crotalus atrox">Crotalus atrox</option>
+              <option value="Crotalus lepidus">Crotalus lepidus</option>
+              <option value="Crotalus molossus">Crotalus molossus</option>
+              <option value="Crotalus scutulatus">Crotalus scutulatus</option>
+              <option value="Boa constrictor">Boa constrictor</option>
+              <option value="Python regius">Python regius</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="input-genetica">Genética / Fase *</label>
+            <input type="text" id="input-genetica" required placeholder="Ej. Albino Het Patternless">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="select-sexo">Sexo *</label>
+              <select id="select-sexo" class="custom-select" required>
+                <option value="Macho">Macho</option>
+                <option value="Hembra">Hembra</option>
+                <option value="No sexado">No sexado</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="input-nacimiento">Año Nacimiento *</label>
+              <input type="number" id="input-nacimiento" class="no-spinner" required min="2000" max="2030" placeholder="2026">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="input-precio">Precio ($ MXN) *</label>
+              <input type="number" id="input-precio" class="no-spinner" required min="0" step="any" placeholder="4500">
+            </div>
+
+            <div class="form-group">
+              <label for="select-estatus">Disponibilidad *</label>
+              <select id="select-estatus" class="custom-select" required>
+                <option value="Disponible">Disponible</option>
+                <option value="Apartado">Apartado</option>
+                <option value="Vendido">Vendido</option>
+                <option value="Holdback">Holdback</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- CARGA DE IMÁGENES -->
+          <div class="form-row photos-row">
+            <div class="form-group">
+              <label for="input-foto">Fotografía Principal *</label>
+              <div class="file-upload-wrapper">
+                <input type="file" id="input-foto" accept="image/*" class="custom-file-input" required>
+                <label for="input-foto" class="file-upload-label">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <span id="file-name-display">Seleccionar foto 1...</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-foto-2">Fotografía 2 (Opcional)</label>
+              <div class="file-upload-wrapper">
+                <input type="file" id="input-foto-2" accept="image/*" class="custom-file-input">
+                <label for="input-foto-2" class="file-upload-label">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <span id="file-name-display-2">Seleccionar foto 2...</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="input-foto-3">Fotografía 3 (Opcional)</label>
+              <div class="file-upload-wrapper">
+                <input type="file" id="input-foto-3" accept="image/*" class="custom-file-input">
+                <label for="input-foto-3" class="file-upload-label">
+                  <i class="fa-solid fa-cloud-arrow-up"></i>
+                  <span id="file-name-display-3">Seleccionar foto 3...</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" id="btn-guardar" class="btn-guardar">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar Ejemplar
+          </button>
+        </form>
+      </section>
+
+      <div class="admin-layout-grid">
+
+        <!-- PANEL DE FILTROS -->
+        <aside class="inv-filters-col filtros-compactos">
+          <div class="filters-header">
+            <h3><i class="fa-solid fa-filter"></i> Filtros</h3>
+            <button type="button" class="btn-text-clear" id="btn-limpiar-filtros-top">Limpiar</button>
+          </div>
+
+          <div class="fila-filtros">
+            <div class="grupo-filtro">
+              <label>Especie</label>
+              <div class="multi-select-dropdown" id="filtro-especie-container">
+                <div class="dropdown-trigger" id="dropdown-trigger-especie">
+                  <span class="trigger-label" id="trigger-label-especie">Todas</span>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <div class="dropdown-menu" id="container-filtro-especie"></div>
+              </div>
+            </div>
+
+            <div class="grupo-filtro">
+              <label>Sexo</label>
+              <select id="filtro-sexo" class="admin-input-sm">
+                <option value="">Todos</option>
+                <option value="Macho">Macho</option>
+                <option value="Hembra">Hembra</option>
+                <option value="No sexado">No sexado</option>
+              </select>
+            </div>
+
+            <div class="grupo-filtro">
+              <label>Estatus</label>
+              <select id="filtro-estatus" class="admin-input-sm">
+                <option value="">Todos</option>
+                <option value="Disponible">Disponible</option>
+                <option value="Apartado">Apartado</option>
+                <option value="Vendido">Vendido</option>
+                <option value="Holdback">Holdback</option>
+              </select>
+            </div>
+
+            <div class="grupo-filtro">
+              <label>Año</label>
+              <input type="number" id="filtro-anio" class="admin-input-sm" placeholder="2026" min="2010" max="2030">
+            </div>
+          </div>
+
+          <div class="fila-acciones">
+            <button type="button" id="btn-aplicar-filtros" class="btn-filter-apply">
+              <i class="fa-solid fa-sliders"></i> Aplicar
+            </button>
+            <button type="button" id="btn-limpiar-filtros" class="btn-filter-clear">
+              <i class="fa-solid fa-rotate-left"></i> Limpiar
+            </button>
+          </div>
+        </aside>
+
+        <!-- LISTADO DE INVENTARIO -->
+        <section class="admin-panel inventory-panel">
+          <div class="panel-header header-inventory">
+            <h2><i class="fa-solid fa-boxes-stacked"></i> Inventario Activo</h2>
+            <div class="inventory-toolbar">
+              <button type="button" id="btn-toggle-limit" class="btn-cancelar">Ver últimos 5</button>
+            </div>
+          </div>
+
+          <div id="cards-container" class="cards-grid"></div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL DE EDICIÓN -->
+  <div id="modal-edicion" class="modal-overlay hidden">
+    <div class="modal-content admin-panel">
+      <div class="panel-header">
+        <h2 id="modal-title"><i class="fa-solid fa-pen-to-square"></i> Editar Ejemplar</h2>
+        <button type="button" id="btn-close-modal" class="btn-close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="form-modal-edicion" class="modal-grid-form">
+        <input type="hidden" id="edit-id-original">
+
+        <div class="form-group">
+          <label for="edit-especie">Especie *</label>
+          <select id="edit-especie" class="custom-select" required>
+            <option value="Crotalus atrox">Crotalus atrox</option>
+            <option value="Crotalus lepidus">Crotalus lepidus</option>
+            <option value="Crotalus molossus">Crotalus molossus</option>
+            <option value="Crotalus scutulatus">Crotalus scutulatus</option>
+            <option value="Boa constrictor">Boa constrictor</option>
+            <option value="Python regius">Python regius</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-genetica">Genética / Fase *</label>
+          <input type="text" id="edit-genetica" required>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-sexo">Sexo *</label>
+          <select id="edit-sexo" class="custom-select" required>
+            <option value="Macho">Macho</option>
+            <option value="Hembra">Hembra</option>
+            <option value="No sexado">No sexado</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-nacimiento">Año Nacimiento *</label>
+          <input type="number" id="edit-nacimiento" class="no-spinner" required min="2000" max="2030">
+        </div>
+
+        <div class="form-group">
+          <label for="edit-precio">Precio ($ MXN) *</label>
+          <input type="number" id="edit-precio" class="no-spinner" required min="0" step="any">
+        </div>
+
+        <div class="form-group">
+          <label for="edit-estatus">Disponibilidad *</label>
+          <select id="edit-estatus" class="custom-select" required>
+            <option value="Disponible">Disponible</option>
+            <option value="Apartado">Apartado</option>
+            <option value="Vendido">Vendido</option>
+            <option value="Holdback">Holdback</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-foto">Reemplazar Foto 1</label>
+          <div class="file-upload-wrapper">
+            <input type="file" id="edit-foto" accept="image/*" class="custom-file-input">
+            <label for="edit-foto" class="file-upload-label">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span id="edit-file-name-display">Cambiar foto 1...</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-foto-2">Reemplazar Foto 2</label>
+          <div class="file-upload-wrapper">
+            <input type="file" id="edit-foto-2" accept="image/*" class="custom-file-input">
+            <label for="edit-foto-2" class="file-upload-label">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span id="edit-file-name-display-2">Cambiar foto 2...</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="edit-foto-3">Reemplazar Foto 3</label>
+          <div class="file-upload-wrapper">
+            <input type="file" id="edit-foto-3" accept="image/*" class="custom-file-input">
+            <label for="edit-foto-3" class="file-upload-label">
+              <i class="fa-solid fa-cloud-arrow-up"></i>
+              <span id="edit-file-name-display-3">Cambiar foto 3...</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" id="btn-save-modal" class="btn-guardar">
+            <i class="fa-solid fa-check"></i> Actualizar Ejemplar
+          </button>
+          <button type="button" id="btn-cancel-modal" class="btn-cancelar">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- FOOTER RESTRUCTURADO Y UNIFICADO -->
+  <footer class="main-footer">
+    <div class="footer-container">
+      <nav class="footer-nav" aria-label="Navegación secundaria">
+        <a href="/index.html">Catálogo</a>
+        <span class="separator">•</span>
+        <a href="/src/pages/nosotros.html">Nosotros</a>
+        <span class="separator">•</span>
+        <a href="/src/pages/admin.html">Admin</a>
+      </nav>
+      <p class="copyright">&copy; 2026 Escama y Colmillo - Control Interno</p>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/views/admin-view.js"></script>
+</body>
+</html>

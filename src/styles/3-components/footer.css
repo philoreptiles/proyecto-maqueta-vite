@@ -1,0 +1,78 @@
+/* src/styles/3-components/footer.css */
+
+.main-footer {
+  background: var(--color-surface, #161b22);
+  border-top: 1px solid var(--color-border, #30363d);
+  padding: 18px 20px;
+  margin-top: auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.footer-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.footer-nav a {
+  color: var(--color-text-muted, #8b949e);
+  text-decoration: none;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  padding: 4px 2px;
+}
+
+.footer-nav a:hover {
+  color: var(--color-primary, #e3a008);
+}
+
+.footer-nav .separator {
+  color: var(--color-border, #30363d);
+  font-size: 0.75rem;
+}
+
+.copyright {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #8b949e);
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+}
+
+/* RESPONSIVO FOOTER CELULARES */
+@media (max-width: 768px) {
+  .main-footer {
+    padding: 14px 10px;
+    margin-top: 24px;
+  }
+
+  .footer-container {
+    gap: 6px;
+  }
+
+  .footer-nav {
+    gap: 8px;
+  }
+
+  .footer-nav a {
+    font-size: 0.74rem;
+  }
+
+  .copyright {
+    font-size: 0.68rem;
+  }
+}

@@ -1,0 +1,172 @@
+/* src/styles/3-components/header.css */
+
+.main-header {
+  background: var(--color-surface, #161b22);
+  border-bottom: 1px solid var(--color-border, #30363d);
+  padding: 16px 24px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.header-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brand-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text, #f0f6fc);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.slogan {
+  font-size: 0.8rem;
+  color: var(--color-text-muted, #8b949e);
+  margin: 0;
+}
+
+.pimvs {
+  font-size: 0.68rem;
+  color: var(--color-primary, #e3a008);
+  font-weight: 600;
+  letter-spacing: 0.4px;
+}
+
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.header-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-nav {
+  color: var(--color-text-muted, #8b949e);
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  box-sizing: border-box;
+}
+
+.btn-nav:hover {
+  color: var(--color-text, #f0f6fc);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.btn-nav.activo {
+  background: var(--color-primary, #e3a008);
+  color: #000;
+  border-color: var(--color-primary, #e3a008);
+}
+
+.btn-header-whatsapp {
+  background: #f97316;
+  color: #ffffff;
+  text-decoration: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  min-height: 38px;
+  box-sizing: border-box;
+}
+
+.btn-header-whatsapp:hover {
+  background: #ea580c;
+  transform: translateY(-1px);
+}
+
+/* OPTIMIZACIÓN RESPONSIVA CELULARES */
+@media (max-width: 768px) {
+  .main-header {
+    padding: 10px 12px;
+  }
+
+  .header-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .header-brand {
+    align-items: center;
+    text-align: center;
+  }
+
+  .brand-title {
+    font-size: 1.15rem;
+  }
+
+  .slogan {
+    font-size: 0.72rem;
+  }
+
+  .pimvs {
+    font-size: 0.62rem;
+  }
+
+  .header-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .header-nav {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 320px;
+    gap: 8px;
+    margin: 0 auto;
+  }
+
+  .btn-nav {
+    flex: 1;
+    padding: 6px 12px;
+    font-size: 0.78rem;
+    min-height: 36px;
+    text-align: center;
+  }
+
+  .btn-header-whatsapp {
+    width: 100%;
+    max-width: 320px;
+    padding: 8px 10px;
+    font-size: 0.78rem;
+    min-height: 36px;
+    margin: 0 auto;
+  }
+}
