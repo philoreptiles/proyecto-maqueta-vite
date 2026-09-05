@@ -1,7 +1,7 @@
 import { supabase } from '../js/supabase-config.js';
 import { comprimirImagen } from '../utils/image-compressor.js';
 
-// Nombre exacto del Bucket en tu panel de Supabase > Storage
+// Nombre exacto del Bucket en Supabase Storage
 const BUCKET_NAME = 'ejemplares';
 
 let inventarioCompleto = [];
@@ -86,37 +86,33 @@ function setupEventListeners() {
   });
 }
 
-/* SUBIDA DE IMÁGENES A SUPABASE STORAGE CON COMPRESIÓN WEB P */
+/* SUBIDA DE IMÁGENES A SUPABASE STORAGE CON COMPRESIÓN WEBP */
 async function procesarYSubirImagen(file) {
   if (!file) return null;
 
   try {
-    // 1. Optimizar imagen mediante Canvas
     const archivoOptimizado = await comprimirImagen(file);
-
     const fileExt = archivoOptimizado.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
 
-    // 2. Subida al bucket
     const { error: uploadError } = await supabase.storage
       .from(BUCKET_NAME)
       .upload(fileName, archivoOptimizado, { cacheControl: '3600', upsert: false });
 
     if (uploadError) {
       if (uploadError.message?.includes('Bucket not found') || uploadError.error === 'Bucket not found') {
-        throw new Error(`El bucket '${BUCKET_NAME}' no existe en tu proyecto de Supabase. Créalo desde el panel de Supabase > Storage con el nombre '${BUCKET_NAME}' y actívalo como Público.`);
+        throw new Error(`El bucket '${BUCKET_NAME}' no existe en tu proyecto de Supabase. Créalo desde el panel con acceso público.`);
       }
       throw uploadError;
     }
 
-    // 3. Obtener URL pública
     const { data } = supabase.storage
       .from(BUCKET_NAME)
       .getPublicUrl(fileName);
 
     return data.publicUrl;
   } catch (err) {
-    console.error(`Error al procesar/subir imagen al bucket '${BUCKET_NAME}':`, err);
+    console.error(`Error al procesar/subir imagen:`, err);
     throw err;
   }
 }
@@ -151,12 +147,13 @@ async function handleGuardarEjemplar(e) {
       procesarYSubirImagen(file3)
     ]);
 
+    // Mapeo exacto con los nombres de columna de tu tabla Postgres
     const nuevoEjemplar = {
       id,
       especie,
       genetica,
       sexo,
-      anio_nacimiento: anio,
+      nacimiento: anio, // Cambiado de 'anio_nacimiento' a 'nacimiento'
       precio,
       estatus,
       imagen_url,
@@ -274,7 +271,7 @@ function aplicarFiltros() {
     if (especiesSel.length > 0 && !especiesSel.includes(item.especie)) return false;
     if (sexo && item.sexo !== sexo) return false;
     if (estatus && item.estatus !== estatus) return false;
-    if (anio && String(item.anio_nacimiento) !== String(anio)) return false;
+    if (anio && String(item.nacimiento) !== String(anio)) return false;
     return true;
   });
 
@@ -327,7 +324,7 @@ function renderizarCards(items) {
         <span class="card-especie">${item.especie}</span>
         <div class="card-details">
           <span><i class="fa-solid fa-venus-mars"></i> ${item.sexo}</span>
-          <span><i class="fa-solid fa-calendar"></i> ${item.anio_nacimiento}</span>
+          <span><i class="fa-solid fa-calendar"></i> ${item.nacimiento}</span>
         </div>
         <div class="card-price">$${Number(item.precio || 0).toLocaleString('es-MX')} MXN</div>
         <div class="card-actions">
@@ -352,7 +349,7 @@ window.abrirEdicionModal = function(id) {
   document.getElementById('edit-especie').value = item.especie;
   document.getElementById('edit-genetica').value = item.genetica;
   document.getElementById('edit-sexo').value = item.sexo;
-  document.getElementById('edit-nacimiento').value = item.anio_nacimiento;
+  document.getElementById('edit-nacimiento').value = item.nacimiento;
   document.getElementById('edit-precio').value = item.precio;
   document.getElementById('edit-estatus').value = item.estatus;
 
@@ -399,7 +396,7 @@ async function handleGuardarModalEdicion(e) {
       especie,
       genetica,
       sexo,
-      anio_nacimiento: anio,
+      nacimiento: anio, // Cambiado de 'anio_nacimiento' a 'nacimiento'
       precio,
       estatus
     };
