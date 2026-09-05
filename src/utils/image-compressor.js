@@ -1,13 +1,17 @@
 /**
- * Comprime y redimensiona una imagen utilizando Canvas API.
+ * Comprime y redimensiona una imagen utilizando Canvas API en formato WebP.
  * @param {File} file - Archivo de imagen original.
  * @param {number} calidad - Calidad de compresión (0.1 a 1.0).
  * @param {number} maxAncho - Ancho máximo permitido.
  * @param {number} maxAlto - Alto máximo permitido.
- * @returns {Promise<File>} Archivo comprimido en formato WebP.
+ * @returns {Promise<File>} Archivo optimizado.
  */
-export async function comprimirImagen(file, calidad = 0.75, maxAncho = 1200, maxAlto = 1200) {
-  return new Promise((resolve, reject) => {
+export async function comprimirImagen(file, calidad = 0.8, maxAncho = 1200, maxAlto = 1200) {
+  if (!file || !file.type.startsWith('image/')) {
+    return file;
+  }
+
+  return new Promise((resolve) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
 
@@ -39,12 +43,12 @@ export async function comprimirImagen(file, calidad = 0.75, maxAncho = 1200, max
         canvas.toBlob(
           (blob) => {
             if (!blob) {
-              reject(new Error('Error al procesar el lienzo de imagen.'));
+              resolve(file);
               return;
             }
 
-            const nombreLimpio = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
-            const nuevoNombre = `${nombreLimpio}_compressed.webp`;
+            const nombreBase = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+            const nuevoNombre = `${nombreBase}_${Date.now()}.webp`;
 
             const archivoComprimido = new File([blob], nuevoNombre, {
               type: 'image/webp',
@@ -58,36 +62,9 @@ export async function comprimirImagen(file, calidad = 0.75, maxAncho = 1200, max
         );
       };
 
-      img.onerror = (err) => reject(new Error('Error al cargar la imagen: ' + err));
+      img.onerror = () => resolve(file);
     };
 
-    reader.onerror = (err) => reject(new Error('Error al leer el archivo: ' + err));
+    reader.onerror = () => resolve(file);
   });
-}
-
-/**
- * Procesa la imagen del input y calcula métricas de compresión.
- * @param {HTMLInputElement} fileInput 
- * @param {number} calidad 
- * @returns {Promise<{file: File, stats: {originalKb: string, comprimidoKb: string, ahorro: string}}|null>}
- */
-export async function procesarFotoConCompresion(fileInput, calidad = 0.75) {
-  if (!fileInput.files || fileInput.files.length === 0) return null;
-
-  const archivoOriginal = fileInput.files[0];
-  const tamanoOriginalKb = archivoOriginal.size / 1024;
-
-  const archivoComprimido = await comprimirImagen(archivoOriginal, calidad);
-  const tamanoComprimidoKb = archivoComprimido.size / 1024;
-
-  const ahorroPorcentaje = ((1 - tamanoComprimidoKb / tamanoOriginalKb) * 100).toFixed(1);
-
-  return {
-    file: archivoComprimido,
-    stats: {
-      originalKb: tamanoOriginalKb.toFixed(1),
-      comprimidoKb: tamanoComprimidoKb.toFixed(1),
-      ahorro: Math.max(0, ahorroPorcentaje)
-    }
-  };
 }
