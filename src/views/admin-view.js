@@ -147,13 +147,12 @@ async function handleGuardarEjemplar(e) {
       procesarYSubirImagen(file3)
     ]);
 
-    // Mapeo exacto con los nombres de columna de tu tabla Postgres
     const nuevoEjemplar = {
       id,
       especie,
       genetica,
       sexo,
-      nacimiento: anio, // Cambiado de 'anio_nacimiento' a 'nacimiento'
+      nacimiento: anio,
       precio,
       estatus,
       imagen_url,
@@ -300,7 +299,7 @@ function toggleLimite() {
   aplicarFiltros();
 }
 
-/* RENDER CARDS */
+/* RENDER CARDS CON LAZY LOADING */
 function renderizarCards(items) {
   const container = document.getElementById('cards-container');
   if (!container) return;
@@ -315,7 +314,13 @@ function renderizarCards(items) {
   container.innerHTML = lista.map(item => `
     <div class="item-card">
       <div class="card-image-wrapper">
-        <img src="${item.imagen_url || '/placeholder.jpg'}" alt="${item.genetica || ''}" class="card-image">
+        <img 
+          src="${item.imagen_url || '/placeholder.jpg'}" 
+          alt="${item.genetica || ''}" 
+          class="card-image"
+          loading="lazy"
+          decoding="async"
+        >
         <span class="card-status-badge status-${(item.estatus || '').toLowerCase()}">${item.estatus || ''}</span>
       </div>
       <div class="card-body">
@@ -396,7 +401,7 @@ async function handleGuardarModalEdicion(e) {
       especie,
       genetica,
       sexo,
-      nacimiento: anio, // Cambiado de 'anio_nacimiento' a 'nacimiento'
+      nacimiento: anio,
       precio,
       estatus
     };
