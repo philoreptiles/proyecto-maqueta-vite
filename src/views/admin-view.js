@@ -1,4 +1,7 @@
-import { supabase } from '../js/supabase-config.js'; // Ruta relativa corregida hacia src/js/
+import { supabase } from '../js/supabase-config.js';
+
+// Nombre del bucket configurado en Supabase Storage
+const BUCKET_NAME = 'ejemplares';
 
 let inventarioCompleto = [];
 let mostrandoUltimos5 = false;
@@ -89,21 +92,20 @@ async function procesarYSubirImagen(file) {
   try {
     const fileExt = file.name.split('.').pop();
     const fileName = `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${fileExt}`;
-    const filePath = `ejemplares/${fileName}`;
 
     const { error: uploadError } = await supabase.storage
-      .from('imagenes_ejemplares')
-      .upload(filePath, file, { cacheControl: '3600', upsert: false });
+      .from(BUCKET_NAME)
+      .upload(fileName, file, { cacheControl: '3600', upsert: false });
 
     if (uploadError) throw uploadError;
 
     const { data } = supabase.storage
-      .from('imagenes_ejemplares')
-      .getPublicUrl(filePath);
+      .from(BUCKET_NAME)
+      .getPublicUrl(fileName);
 
     return data.publicUrl;
   } catch (err) {
-    console.error('Error al subir imagen:', err);
+    console.error(`Error al subir imagen al bucket '${BUCKET_NAME}':`, err);
     throw err;
   }
 }
@@ -112,23 +114,25 @@ async function procesarYSubirImagen(file) {
 async function handleGuardarEjemplar(e) {
   e.preventDefault();
   const btnGuardar = document.getElementById('btn-guardar');
-  const originalText = btnGuardar.innerHTML;
+  const originalText = btnGuardar ? btnGuardar.innerHTML : '';
 
   try {
-    btnGuardar.disabled = true;
-    btnGuardar.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
+    if (btnGuardar) {
+      btnGuardar.disabled = true;
+      btnGuardar.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Guardando...`;
+    }
 
-    const id = document.getElementById('input-id').value.trim();
-    const especie = document.getElementById('select-especie').value;
-    const genetica = document.getElementById('input-genetica').value.trim();
-    const sexo = document.getElementById('select-sexo').value;
-    const anio = parseInt(document.getElementById('input-nacimiento').value, 10);
-    const precio = parseFloat(document.getElementById('input-precio').value);
-    const estatus = document.getElementById('select-estatus').value;
+    const id = document.getElementById('input-id')?.value.trim();
+    const especie = document.getElementById('select-especie')?.value;
+    const genetica = document.getElementById('input-genetica')?.value.trim();
+    const sexo = document.getElementById('select-sexo')?.value;
+    const anio = parseInt(document.getElementById('input-nacimiento')?.value, 10);
+    const precio = parseFloat(document.getElementById('input-precio')?.value);
+    const estatus = document.getElementById('select-estatus')?.value;
 
-    const file1 = document.getElementById('input-foto').files[0];
-    const file2 = document.getElementById('input-foto-2').files[0];
-    const file3 = document.getElementById('input-foto-3').files[0];
+    const file1 = document.getElementById('input-foto')?.files[0];
+    const file2 = document.getElementById('input-foto-2')?.files[0];
+    const file3 = document.getElementById('input-foto-3')?.files[0];
 
     const [imagen_url, imagen_url_2, imagen_url_3] = await Promise.all([
       procesarYSubirImagen(file1),
@@ -152,22 +156,27 @@ async function handleGuardarEjemplar(e) {
     const { error } = await supabase.from('ejemplares').insert([nuevoEjemplar]);
     if (error) throw error;
 
-    document.getElementById('form-ejemplar').reset();
+    document.getElementById('form-ejemplar')?.reset();
     resetFileLabels();
     await cargarInventario();
     alert('Ejemplar registrado exitosamente.');
   } catch (err) {
     alert(`Error al guardar: ${err.message || err}`);
   } finally {
-    btnGuardar.disabled = false;
-    btnGuardar.innerHTML = originalText;
+    if (btnGuardar) {
+      btnGuardar.disabled = false;
+      btnGuardar.innerHTML = originalText;
+    }
   }
 }
 
 function resetFileLabels() {
-  document.getElementById('file-name-display').textContent = 'Seleccionar foto 1...';
-  document.getElementById('file-name-display-2').textContent = 'Seleccionar foto 2...';
-  document.getElementById('file-name-display-3').textContent = 'Seleccionar foto 3...';
+  const f1 = document.getElementById('file-name-display');
+  const f2 = document.getElementById('file-name-display-2');
+  const f3 = document.getElementById('file-name-display-3');
+  if (f1) f1.textContent = 'Seleccionar foto 1...';
+  if (f2) f2.textContent = 'Seleccionar foto 2...';
+  if (f3) f3.textContent = 'Seleccionar foto 3...';
 }
 
 /* CARGAR INVENTARIO */
@@ -199,10 +208,15 @@ function actualizarMetricas(items) {
     .filter(i => i.estatus === 'Disponible')
     .reduce((acc, curr) => acc + (Number(curr.precio) || 0), 0);
 
-  document.getElementById('metric-total').textContent = total;
-  document.getElementById('metric-disponibles').textContent = disponibles;
-  document.getElementById('metric-apartados').textContent = apartados;
-  document.getElementById('metric-valor').textContent = `$${valorTotal.toLocaleString('es-MX')} MXN`;
+  const elTotal = document.getElementById('metric-total');
+  const elDisp = document.getElementById('metric-disponibles');
+  const elApart = document.getElementById('metric-apartados');
+  const elValor = document.getElementById('metric-valor');
+
+  if (elTotal) elTotal.textContent = total;
+  if (elDisp) elDisp.textContent = disponibles;
+  if (elApart) elApart.textContent = apartados;
+  if (elValor) elValor.textContent = `$${valorTotal.toLocaleString('es-MX')} MXN`;
 }
 
 /* DROPDOWN FILTRO DE ESPECIES */
@@ -227,6 +241,7 @@ function poblarFiltroEspecies(items) {
 function actualizarLabelTriggerEspecie() {
   const seleccionados = Array.from(document.querySelectorAll('.chk-especie:checked')).map(c => c.value);
   const label = document.getElementById('trigger-label-especie');
+  if (!label) return;
 
   if (seleccionados.length === 0) {
     label.textContent = 'Todas';
@@ -240,9 +255,9 @@ function actualizarLabelTriggerEspecie() {
 /* FILTRADO */
 function aplicarFiltros() {
   const especiesSel = Array.from(document.querySelectorAll('.chk-especie:checked')).map(c => c.value);
-  const sexo = document.getElementById('filtro-sexo').value;
-  const estatus = document.getElementById('filtro-estatus').value;
-  const anio = document.getElementById('filtro-anio').value;
+  const sexo = document.getElementById('filtro-sexo')?.value || '';
+  const estatus = document.getElementById('filtro-estatus')?.value || '';
+  const anio = document.getElementById('filtro-anio')?.value || '';
 
   let resultado = inventarioCompleto.filter(item => {
     if (especiesSel.length > 0 && !especiesSel.includes(item.especie)) return false;
@@ -258,16 +273,22 @@ function aplicarFiltros() {
 function limpiarFiltros() {
   document.querySelectorAll('.chk-especie').forEach(c => c.checked = false);
   actualizarLabelTriggerEspecie();
-  document.getElementById('filtro-sexo').value = '';
-  document.getElementById('filtro-estatus').value = '';
-  document.getElementById('filtro-anio').value = '';
+
+  const fSexo = document.getElementById('filtro-sexo');
+  const fEstatus = document.getElementById('filtro-estatus');
+  const fAnio = document.getElementById('filtro-anio');
+
+  if (fSexo) fSexo.value = '';
+  if (fEstatus) fEstatus.value = '';
+  if (fAnio) fAnio.value = '';
+
   renderizarCards(inventarioCompleto);
 }
 
 function toggleLimite() {
   mostrandoUltimos5 = !mostrandoUltimos5;
   const btn = document.getElementById('btn-toggle-limit');
-  btn.textContent = mostrandoUltimos5 ? 'Ver Todos' : 'Ver últimos 5';
+  if (btn) btn.textContent = mostrandoUltimos5 ? 'Ver Todos' : 'Ver últimos 5';
   aplicarFiltros();
 }
 
@@ -286,8 +307,8 @@ function renderizarCards(items) {
   container.innerHTML = lista.map(item => `
     <div class="item-card">
       <div class="card-image-wrapper">
-        <img src="${item.imagen_url || '/placeholder.jpg'}" alt="${item.genetica}" class="card-image">
-        <span class="card-status-badge status-${(item.estatus || '').toLowerCase()}">${item.estatus}</span>
+        <img src="${item.imagen_url || '/placeholder.jpg'}" alt="${item.genetica || ''}" class="card-image">
+        <span class="card-status-badge status-${(item.estatus || '').toLowerCase()}">${item.estatus || ''}</span>
       </div>
       <div class="card-body">
         <span class="card-id">#${item.id}</span>
@@ -297,7 +318,7 @@ function renderizarCards(items) {
           <span><i class="fa-solid fa-venus-mars"></i> ${item.sexo}</span>
           <span><i class="fa-solid fa-calendar"></i> ${item.anio_nacimiento}</span>
         </div>
-        <div class="card-price">$${Number(item.precio).toLocaleString('es-MX')} MXN</div>
+        <div class="card-price">$${Number(item.precio || 0).toLocaleString('es-MX')} MXN</div>
         <div class="card-actions">
           <button class="btn-card-action" onclick="window.abrirEdicionModal('${item.id}')">
             <i class="fa-solid fa-pen"></i>
@@ -324,26 +345,32 @@ window.abrirEdicionModal = function(id) {
   document.getElementById('edit-precio').value = item.precio;
   document.getElementById('edit-estatus').value = item.estatus;
 
-  document.getElementById('edit-file-name-display').textContent = 'Cambiar foto 1...';
-  document.getElementById('edit-file-name-display-2').textContent = 'Cambiar foto 2...';
-  document.getElementById('edit-file-name-display-3').textContent = 'Cambiar foto 3...';
+  const f1 = document.getElementById('edit-file-name-display');
+  const f2 = document.getElementById('edit-file-name-display-2');
+  const f3 = document.getElementById('edit-file-name-display-3');
 
-  document.getElementById('modal-edicion').classList.remove('hidden');
+  if (f1) f1.textContent = 'Cambiar foto 1...';
+  if (f2) f2.textContent = 'Cambiar foto 2...';
+  if (f3) f3.textContent = 'Cambiar foto 3...';
+
+  document.getElementById('modal-edicion')?.classList.remove('hidden');
 };
 
 function cerrarModal() {
-  document.getElementById('modal-edicion').classList.add('hidden');
-  document.getElementById('form-modal-edicion').reset();
+  document.getElementById('modal-edicion')?.classList.add('hidden');
+  document.getElementById('form-modal-edicion')?.reset();
 }
 
 async function handleGuardarModalEdicion(e) {
   e.preventDefault();
   const btnSave = document.getElementById('btn-save-modal');
-  const originalText = btnSave.innerHTML;
+  const originalText = btnSave ? btnSave.innerHTML : '';
 
   try {
-    btnSave.disabled = true;
-    btnSave.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Actualizando...`;
+    if (btnSave) {
+      btnSave.disabled = true;
+      btnSave.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Actualizando...`;
+    }
 
     const id = document.getElementById('edit-id-original').value;
     const especie = document.getElementById('edit-especie').value;
@@ -353,9 +380,9 @@ async function handleGuardarModalEdicion(e) {
     const precio = parseFloat(document.getElementById('edit-precio').value);
     const estatus = document.getElementById('edit-estatus').value;
 
-    const file1 = document.getElementById('edit-foto').files[0];
-    const file2 = document.getElementById('edit-foto-2').files[0];
-    const file3 = document.getElementById('edit-foto-3').files[0];
+    const file1 = document.getElementById('edit-foto')?.files[0];
+    const file2 = document.getElementById('edit-foto-2')?.files[0];
+    const file3 = document.getElementById('edit-foto-3')?.files[0];
 
     const updates = {
       especie,
@@ -383,8 +410,10 @@ async function handleGuardarModalEdicion(e) {
   } catch (err) {
     alert(`Error al actualizar: ${err.message || err}`);
   } finally {
-    btnSave.disabled = false;
-    btnSave.innerHTML = originalText;
+    if (btnSave) {
+      btnSave.disabled = false;
+      btnSave.innerHTML = originalText;
+    }
   }
 }
 
