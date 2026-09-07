@@ -1,6 +1,7 @@
 // ============================================
 // modal.js - Lógica de Ficha Ampliada, Zoom y Navegación
 // ============================================
+import { obtenerUrlThumbnail } from '../utils/image-compressor.js';
 
 const WHATSAPP_NUMERO = '525573461033';
 
@@ -132,9 +133,10 @@ export function abrirModalEjemplar(ejemplar, listaContexto = [], indiceForzado =
     : ejemplar.precio;
   const precioFormatted = (precioNum || 0).toLocaleString('en-US');
 
+  // Lectura tolerante de columnas antiguas
   const img1 = ejemplar.imagen_url || ejemplar.imagen_url_1 || ejemplar.imagen_1 || ejemplar.imagen;
-  const img2 = ejemplar.imagen_url_2 || ejemplar.imagen_url2 || ejemplar.imagen_2;
-  const img3 = ejemplar.imagen_url_3 || ejemplar.imagen_url3 || ejemplar.imagen_3;
+  const img2 = ejemplar.imagen_url2 || ejemplar.imagen_url_2 || ejemplar.imagen_2;
+  const img3 = ejemplar.imagen_url3 || ejemplar.imagen_url_3 || ejemplar.imagen_3;
 
   const imagenes = [img1, img2, img3].filter(url => url && typeof url === 'string' && url.trim() !== '');
 
@@ -142,7 +144,6 @@ export function abrirModalEjemplar(ejemplar, listaContexto = [], indiceForzado =
   const thumbsContainer = document.getElementById('modal-galeria-thumbs');
 
   if (mainImg) {
-    // OPTIMIZACIÓN 1: El visualizador principal recibe la URL que almacenamos en DB y asume calidad Full 1200x1200px
     mainImg.src = imagenes.length > 0 ? imagenes[0] : 'https://placehold.co/600x400/141b21/94a3b8?text=Sin+imagen';
     mainImg.alt = ejemplar.genetica || 'Ejemplar';
     mainImg.style.transformOrigin = 'center center';
@@ -154,13 +155,13 @@ export function abrirModalEjemplar(ejemplar, listaContexto = [], indiceForzado =
       imagenes.forEach((url, index) => {
         const thumb = document.createElement('img');
         
-        // Usamos el Thumbnail _thumb para ahorrar peticiones pesadas en las vistas inferiores
-        thumb.src = url.includes('_full.webp') ? url.replace('_full.webp', '_thumb.webp') : url;
+        // Uso de función centralizada
+        thumb.src = obtenerUrlThumbnail(url) || url;
         thumb.alt = `Vista ${index + 1}`;
         thumb.className = `thumb-img ${index === 0 ? 'activo' : ''}`;
         
         thumb.addEventListener('click', () => {
-          mainImg.src = url; // Renderiza el 1200x1200 en el viewer principal
+          mainImg.src = url; 
           thumbsContainer.querySelectorAll('.thumb-img').forEach((t, i) => {
             t.classList.toggle('activo', i === index);
           });

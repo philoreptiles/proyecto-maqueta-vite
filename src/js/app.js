@@ -2,10 +2,12 @@
 // app.js - Punto de entrada del JavaScript
 // ============================================
 
-import { cargarEjemplares } from './catalog.js';
+import { inicializarCatalogo } from './catalog.js';
+import { inicializarModal } from './modal.js';
 
 console.log('🚀 ¡JavaScript está funcionando!');
 
 document.addEventListener('DOMContentLoaded', () => {
-  cargarEjemplares();
+  inicializarCatalogo();
+  inicializarModal();
 });

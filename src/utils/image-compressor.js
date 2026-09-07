@@ -1,90 +1,104 @@
-/**
- * Comprime y redimensiona una imagen utilizando Canvas API en formato WebP.
- * @param {File} file - Archivo de imagen original.
- * @param {number} calidad - Calidad de compresión (0.1 a 1.0).
- * @param {number} maxAncho - Ancho máximo permitido.
- * @param {number} maxAlto - Alto máximo permitido.
- * @param {string} sufijo - Sufijo para el nombre de archivo (ej. '_thumb').
- * @returns {Promise<File>} Archivo optimizado.
- */
-export async function comprimirImagen(file, calidad = 0.8, maxAncho = 1200, maxAlto = 1200, sufijo = '') {
-  if (!file || !file.type.startsWith('image/')) {
-    return file;
-  }
+// src/utils/image-compressor.js
 
-  return new Promise((resolve) => {
+/**
+ * Comprime una imagen a formato WebP ajustando sus dimensiones y calidad.
+ * @param {File} archivo - Archivo de imagen original.
+ * @param {Object} opciones - Configuración de compresión.
+ * @returns {Promise<Blob>} Imagen comprimida en Blob.
+ */
+export function comprimirImagen(archivo, opciones = {}) {
+  const {
+    maxWidth = 1200,
+    maxHeight = 1200,
+    calidad = 0.8,
+    formato = 'image/webp'
+  } = opciones;
+
+  return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.readAsDataURL(file);
+    reader.readAsDataURL(archivo);
 
     reader.onload = (event) => {
       const img = new Image();
       img.src = event.target.result;
 
       img.onload = () => {
-        let ancho = img.width;
-        let alto = img.height;
+        let width = img.width;
+        let height = img.height;
 
-        if (ancho > maxAncho || alto > maxAlto) {
-          if (ancho / alto > maxAncho / maxAlto) {
-            alto = Math.round((alto * maxAncho) / ancho);
-            ancho = maxAncho;
-          } else {
-            ancho = Math.round((ancho * maxAlto) / alto);
-            alto = maxAlto;
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
           }
         }
 
         const canvas = document.createElement('canvas');
-        canvas.width = ancho;
-        canvas.height = alto;
+        canvas.width = width;
+        canvas.height = height;
 
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, ancho, alto);
+        ctx.drawImage(img, 0, 0, width, height);
 
         canvas.toBlob(
           (blob) => {
-            if (!blob) {
-              resolve(file);
-              return;
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Error al comprimir la imagen.'));
             }
-
-            const nombreBase = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
-            // Se inyecta el sufijo para identificar si es thumbnail o imagen completa
-            const nuevoNombre = `${nombreBase}_${Date.now()}${sufijo}.webp`;
-
-            const archivoComprimido = new File([blob], nuevoNombre, {
-              type: 'image/webp',
-              lastModified: Date.now()
-            });
-
-            resolve(archivoComprimido);
           },
-          'image/webp',
+          formato,
           calidad
         );
       };
 
-      img.onerror = () => resolve(file);
+      img.onerror = (err) => reject(err);
     };
 
-    reader.onerror = () => resolve(file);
+    reader.onerror = (err) => reject(err);
   });
 }
 
 /**
- * OPTIMIZACIÓN 1: GENERACIÓN DE THUMBNAILS
- * Genera automáticamente 2 versiones de cada imagen al subirla.
+ * Procesa una imagen generando ambas versiones (Full y Thumb) compartiendo la misma marca de tiempo.
+ * @param {File} archivo 
+ * @param {string} prefix 
  */
-export async function generarVersionesImagen(file) {
-  if (!file || !file.type.startsWith('image/')) {
-    return { thumbnail: file, completa: file };
+export async function procesarImagenCompletaYThumb(archivo, prefix = 'img') {
+  const timeStamp = Date.now() + '_' + Math.random().toString(36).substring(2, 6);
+  const cleanName = archivo.name.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase();
+
+  const fileNameFull = `${prefix}_${timeStamp}_${cleanName}_full.webp`;
+  const fileNameThumb = `${prefix}_${timeStamp}_${cleanName}_thumb.webp`;
+
+  const fullBlob = await comprimirImagen(archivo, { maxWidth: 1200, maxHeight: 1200, calidad: 0.8 });
+  const thumbBlob = await comprimirImagen(archivo, { maxWidth: 400, maxHeight: 400, calidad: 0.7 });
+
+  return {
+    fullBlob,
+    thumbBlob,
+    fileNameFull,
+    fileNameThumb
+  };
+}
+
+/**
+ * Obtiene la URL del thumbnail a partir de la URL de la imagen completa.
+ * Garantiza retrocompatibilidad con imágenes antiguas.
+ * @param {string} urlFull 
+ * @returns {string|null}
+ */
+export function obtenerUrlThumbnail(urlFull) {
+  if (!urlFull || typeof urlFull !== 'string') return null;
+  if (urlFull.includes('_full.webp')) {
+    return urlFull.replace('_full.webp', '_thumb.webp');
   }
-
-  // Thumbnail: 400x400px, calidad 0.7, para la lista principal
-  const thumbnail = await comprimirImagen(file, 0.7, 400, 400, '_thumb');
-  
-  // Completa: 1200x1200px, calidad 0.8, para el modal de detalle
-  const completa = await comprimirImagen(file, 0.8, 1200, 1200, '_full');
-
-  return { thumbnail, completa };
+  // Fallback para registros antiguos
+  return urlFull;
 }
